@@ -3,19 +3,15 @@ from dash.dash_table import FormatTemplate
 import dash_bootstrap_components as dbc
 import pandas as pd
 import openpyxl
-import dash_auth
 
+
+VALID_USERNAME = '1'
+VALID_PASSWORD = '1'
 
 df = pd.read_excel("dashtestdata.xlsx")
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-server = app.server
-
-auth = dash_auth.BasicAuth(
-    app,
-    {'admin': 'alphega'}
-)
 
 options = [
     "Sehir",
@@ -23,6 +19,18 @@ options = [
     "gln",
     "Firma"
 ]
+
+login_layout = html.Div([
+    dbc.Card([
+        html.H3("Login", className="card-title"),
+        dcc.Input(id='username-input', type='text', placeholder='Username'),
+        dcc.Input(id='password-input', type='password', placeholder='Password'),
+        html.Div(id='login-status', children=''),
+        html.Button('Login', id='login-button', n_clicks=0, className="btn btn-primary mt-3")
+
+    ], body=True, style={'width': '300px', 'margin': 'auto', 'marginTop': '100px'})
+])
+
 
 def make_top10_dff(col):
     dff = df[[col, "Aktif / Cikis"]]
@@ -75,7 +83,7 @@ def make_card(n_clicks, col):
     )
 
 
-app.layout = dbc.Container(
+main_layout = dbc.Container(
     [
         html.H3("Vitamin Grubu Satışlar Top 10 Listesi", className="ms-3"),
         dbc.Button("Liste Göster", id="top10-add-list", n_clicks=0, className="m-3"),
@@ -84,6 +92,40 @@ app.layout = dbc.Container(
     ],
     fluid=True,
 )
+
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
+
+@app.callback(
+    Output('page-content', 'children'),
+    Input('url', 'pathname')
+)
+def display_page(pathname):
+    if pathname == '/':
+        return login_layout
+    elif pathname == '/main':
+        return main_layout
+    else:
+        return '404 Page Not Found'
+
+
+@app.callback(
+    Output('login-status', 'children'),
+    Output('url', 'pathname'),
+    Input('login-button', 'n_clicks'),
+    State('username-input', 'value'),
+    State('password-input', 'value')
+)
+def handle_login(n_clicks, username, password):
+    if n_clicks == 0:
+        return '', '/'
+
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        return 'Login successful', '/main'
+    else:
+        return 'Invalid username or password', '/'
 
 
 @app.callback(
