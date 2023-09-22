@@ -1,5 +1,5 @@
-dash==2.9.2
-dash_bootstrap_components==1.4.1
-Flask==2.2.3
-openpyxl==3.0.10
-pandas==2.0.0
+dash
+dash_bootstrap_components
+Flask
+openpyxl
+pandas
