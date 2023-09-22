@@ -4,3 +4,4 @@ Flask
 openpyxl
 pandas
 gunicorn
+dash_auth
