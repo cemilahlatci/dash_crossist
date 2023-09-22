@@ -12,6 +12,7 @@ df = pd.read_excel("dashtestdata.xlsx")
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
+server = app.server
 
 options = [
     "Sehir",
